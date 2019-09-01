@@ -1,8 +1,9 @@
 package org.hibiup.resource
 
+import com.typesafe.scalalogging.StrictLogging
 import org.scalatest.FlatSpec
 
-class EffectResourceTest extends FlatSpec{
+class EffectResourceTest extends FlatSpec with StrictLogging{
 
     "Cat Effect Resource" should "" in {
         import cats.effect.{IO, Resource}
@@ -79,7 +80,13 @@ class EffectResourceTest extends FlatSpec{
         val addDogs: String => IO[String] = x => IO(println("...add a dog...")) *> IO.pure(x ++ " and dogs")
         val greet: String => IO[Unit] = x => IO(println(s"Hello, $x!"))  // 注意：x == cats and dogs
 
-        resource.evalMap(addDogs).use(greet).unsafeRunSync
+        resource
+            .evalMap(addDogs)
+            .use(greet)
+            /**
+              * 3-1) guarantee 相当于 final, 它在资源释放后执行 finalizer，我们可以在这里做一些额外的清扫工作
+              * */
+            .guarantee(IO(logger.info("Application stopped"))).unsafeRunSync
     }
 
     "More then one resource" should "" in {
@@ -102,9 +109,13 @@ class EffectResourceTest extends FlatSpec{
         } yield (outer, inner)
 
         /**
-          * 2) 然后应用于 use 函数
+          * 2) 然后应用于 use 函数。
+          *
+          * 注意：执行完成后对资源的释放顺序和获取的顺序是恰好相反的。
           * */
-        r.use { case (a, b) => IO(println(s"Using $a and $b")) }.unsafeRunSync
+        r.use{
+            case (a, b) => IO(println(s"Using $a and $b"))
+        }.unsafeRunSync
     }
 
     "Auto-closable Resource" should "" in {import cats.effect._

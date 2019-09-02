@@ -11,13 +11,11 @@ lazy val validation = {
     )
 }
 
-lazy val cats = {
-    Seq(
-        "org.typelevel" %% "cats-core",
-        "org.typelevel" %% "cats-free",
-        "org.typelevel" %% "cats-effect"
-    )
-}
+lazy val cats = Seq(
+    "org.typelevel" %% "cats-core",
+    "org.typelevel" %% "cats-free",
+    "org.typelevel" %% "cats-effect"
+)
 
 lazy val logging = {
     val logBackVersion = "1.2.3"
@@ -29,10 +27,16 @@ lazy val logging = {
     )
 }
 
+lazy val akka = Seq(
+    "com.typesafe.akka"   %% "akka-actor",
+    "com.typesafe.akka"   %% "akka-stream"
+)
+
 lazy val dependencies = {
     val catsVersion = "2.0.0-RC2"
+    val akkaVersion = "2.5.25"
 
-    validation.map(_ % Test) ++ logging ++ cats.map(_ % catsVersion)
+    validation.map(_ % Test) ++ logging ++ cats.map(_ % catsVersion) ++ akka.map(_ % akkaVersion)
 }
 
 lazy val root = project.in(file(".")).settings(

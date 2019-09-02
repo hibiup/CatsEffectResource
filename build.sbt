@@ -40,7 +40,7 @@ lazy val dependencies = {
 }
 
 lazy val root = project.in(file(".")).settings(
-    name := "EffectResource",
+    name := "CatsEffectResource",
     scalaVersion := "2.13.0",
     libraryDependencies ++= dependencies,
     scalacOptions ++= Seq(
